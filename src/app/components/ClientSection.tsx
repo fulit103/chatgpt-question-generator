@@ -12,32 +12,38 @@ interface QuizData {
 }
 
 function processText(text: string): QuizData {
-  const quizName = text.match(/Title: (.*)/)?.[1] || '';
+  try {
+    const quizName = text.match(/Title: (.*)/)?.[1] || '';
 
-  const questionsRaw = text.match(/Question\d+: (.*?)\n(.*?)\n(.*?)\n(.*?)\n/g) || [];
+    const questionsRaw = text.match(/Question\d+: (.*?)\n(.*?)\n(.*?)\n(.*?)\n/g) || [];
 
-  const questions = questionsRaw.map(questionRaw => {
-    const questionParts = questionRaw.split("\n").filter(x => x);
-    const question = questionParts[0];
-    const answers = [
-      questionParts[1].split("- ")[1],
-      questionParts[2].split("- ")[1],
-      questionParts[3].split("- ")[1]
-    ];
-    return { question, answers };
-  }).filter(questionObj => questionObj.answers.length === 3);
+    const questions = questionsRaw.map(questionRaw => {
+      const questionParts = questionRaw.split("\n").filter(x => x);
+      const question = questionParts[0];
+      const answers = [
+        questionParts[1].split("- ")[1],
+        questionParts[2].split("- ")[1],
+        questionParts[3].split("- ")[1]
+      ];
+      return { question, answers };
+    }).filter(questionObj => questionObj.answers.length === 3);
 
-  const quizData: QuizData = {
-    quiz_name: quizName,
-    questions
-  };
-
-  return quizData;
+    const quizData: QuizData = {
+      quiz_name: quizName,
+      questions
+    };
+    return quizData;
+  } catch (e){
+    return {
+      quiz_name: "",
+      questions: []
+    }
+  }
 }
 
 export default function ClientSection() {
   const [loading, setLoading] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState("Create a Trivia or Knowledge Test for Phish that educates customers about create a trivia experience about how well you know the band Phish");
   const [prompt, setPrompt] = useState("Q: {input} Create a 5 question personality quiz with 3 multiple choice answers of less than four words in JSON");
   const [response, setResponse] = useState<String>("");
   const [questions, setQuestions] = useState<{
@@ -142,23 +148,29 @@ export default function ClientSection() {
           <div className="animate-pulse font-bold tracking-widest">...</div>
         </button>
       )}
-      <div className="App min-h-screen bg-gray-100 flex items-center justify-center py-6 gap-6 flex-wrap">
-        {questions && questions.map((question, index) => {
-          return (<QuestionCard question={question.question} answers={question.answers} key={index}/>)
-        })}                
-      </div>
-      {response && (
-        <div className="mt-8 rounded-xl border bg-white p-4 shadow-md transition hover:bg-gray-100">
-          <textarea 
-            value={response as string} 
-            readOnly
-            rows={20}
-            maxLength={5000}
-            className="focus:ring-neu w-full rounded-md border border-neutral-400
-            p-4 text-neutral-900 shadow-sm placeholder:text-neutral-400 focus:border-neutral-900"
-          />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-gray-200 p-4">
+          <div className="App min-h-screen bg-gray-100 flex items-center justify-center  gap-6 flex-wrap">
+            {questions && questions.map((question, index) => {
+              return (<QuestionCard question={question.question} answers={question.answers} key={index}/>)
+            })}                
+          </div>
         </div>
-      )}
+        <div className="bg-gray-200 p-4">
+          {response && (
+            <div className="mt-8 rounded-xl border bg-white p-4 shadow-md transition hover:bg-gray-100">
+              <textarea 
+                value={response as string} 
+                readOnly
+                rows={20}
+                maxLength={5000}
+                className="focus:ring-neu w-full rounded-md border border-neutral-400
+                p-4 text-neutral-900 shadow-sm placeholder:text-neutral-400 focus:border-neutral-900"
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

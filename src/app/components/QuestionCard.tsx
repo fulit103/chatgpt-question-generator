@@ -7,7 +7,7 @@ interface QuestionCardProps {
 
 const QuestionCard: React.FC<QuestionCardProps> = ({ question, answers }) => {
   return (
-    <div className="question-card bg-white rounded-lg shadow-md p-6 mx-auto w-full md:w-1/4">
+    <div className="question-card bg-white rounded-lg shadow-md p-6 mx-auto w-full md:w-1/2">
       <h3 className="text-center text-2xl font-semibold mb-6">{question}</h3>
       <div className="flex flex-col items-center space-y-4">
         {answers.map((answer, index) => (
